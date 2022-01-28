@@ -1,0 +1,22 @@
+SELECT so.name,
+    st.name,
+    st.stats_id,
+    sc.stats_column_id,
+    c.name as column_name,
+    st.auto_created,
+    st.filter_definition,
+    sp.last_updated,
+    sp.rows,
+    sp.rows_sampled,
+    sp.steps,
+    sp.modification_counter
+FROM sys.stats AS st
+JOIN sys.stats_columns AS sc on st.object_id=sc.object_id and st.stats_id=sc.stats_id
+JOIN sys.columns as c on sc.object_id=c.object_id and sc.column_id=c.column_id
+JOIN sys.objects as so on st.object_id=so.object_id
+CROSS APPLY sys.dm_db_stats_properties(st.object_id, st.stats_id) sp
+WHERE so.name='table_name'
+ORDER by so.name, st.stats_id, sc.stats_column_id;
+GO
+
+DBCC SHOW_STATISTICS ('Table', 'statistic_name');

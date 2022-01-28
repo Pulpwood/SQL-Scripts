@@ -1,0 +1,9 @@
+select
+  PlanCreated       = qs.creation_time,
+  ObjectName        = object_name(st.objectid),
+  QueryPlan         = cast(qp.query_plan as xml),
+  QueryText         = substring(st.text, 1 + (qs.statement_start_offset / 2), 1 + ((isnull(nullif(qs.statement_end_offset, -1), datalength(st.text)) - qs.statement_start_offset) / 2))
+from sys.dm_exec_query_stats as qs
+  cross apply sys.dm_exec_sql_text(qs.sql_handle) as st
+  cross apply sys.dm_exec_text_query_plan(qs.plan_handle, qs.statement_start_offset, qs.statement_end_offset) as qp
+where object_name(st.objectid) = 'TVF_name'

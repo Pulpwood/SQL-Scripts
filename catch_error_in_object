@@ -1,0 +1,16 @@
+BEGIN TRAN
+  BEGIN try
+    EXEC sp_name_of_stored_procedure
+  BEGIN catch
+      SELECT
+          ERROR_NUMBER() AS ErrorNumber
+          ,ERROR_SEVERITY() AS ErrorSeverity
+          ,ERROR_STATE() AS ErrorState
+          ,ERROR_PROCEDURE() AS ErrorProcedure
+          ,ERROR_LINE() AS ErrorLine
+          ,ERROR_MESSAGE() AS ErrorMessage;
+      IF @@TRANCOUNT >0
+        ROLLBACK TRAN
+  END catch
+  IF @@TRANCOUNT >0
+ROLLBACK TRAN
